@@ -3,13 +3,20 @@ import sys
 from tkinter import *
 from tkinter.ttk import *
 from webbrowser import open_new
+from gtts import gTTS
+from time import sleep
+from tempfile import NamedTemporaryFile
+
+from io import BytesIO
 
 import keyboard
 from bs4 import BeautifulSoup
 from requests_html import HTMLSession
 from steam import steamid
+from playsound import playsound
+from pygame import mixer
 
-
+language="pl"
 
 '''CUSTOM DEFINITIONS'''
 #changes link inside clipboard from Steam user profile to CastleFight profile
@@ -20,33 +27,60 @@ def link_change():
     k=str(str(cf_url)+str(steamid64))
     open_new(k)
 
+
 #pretty self explanatory, I guess
 def get_MMR():
+    try:
 
-    #clears inputbox
-    blank.delete(0, END)
-    url =app.clipboard_get()
+        #clears inputbox
+        blank.delete(0, END)
+        url =app.clipboard_get()
 
-    cf_url ='https://dotacastlefight.com/api/players/'
-    steamid64 =steamid.steam64_from_url(url, http_timeout=30)
-    new_url =str(str(cf_url)+str(steamid64))
+        cf_url ='https://dotacastlefight.com/api/players/'
+        steamid64 =steamid.steam64_from_url(url, http_timeout=30)
+        new_url =str(str(cf_url)+str(steamid64))
 
-    #create html session
-    session = HTMLSession()
-    r = session.get(str(new_url))
+        #create html session
+        session = HTMLSession()
+        r = session.get(str(new_url))
 
-    #get html page content as text
-    html_page =r.html.text
+        #get html page content as text
+        html_page =r.html.text
 
-    #parse and find 'mmr' inside
-    soup = BeautifulSoup(html_page ,'lxml')
-    value =str(soup)[str(soup).find('mmr')+5:str(soup).find('mmr')+9]
+        #parse and find 'mmr' inside
+        soup = BeautifulSoup(html_page ,'lxml')
+        value =str(soup)[str(soup).find('mmr')+5:str(soup).find('mmr')+9]
 
-    #returns 'value' inside inputbox
-    blank.insert(0,value)
+        #returns 'value' inside inputbox
+        blank.insert(0,value)
+
+        #play sound when MMR is here
+        playsound('good.wav')
+
+        #GET Goole to read MMR
+        myobj = gTTS(text=value, lang=language, slow=False)
+
+        #store it
+        f = NamedTemporaryFile(suffix='.mp3',)
+
+        #write to tmpfile
+        myobj.write_to_fp(f)
+
+        #set tmpfile at beggining
+        f.seek(0)
+
+        #read tmpfile
+        mixer.init()
+        mixer.music.load(f)
+        mixer.music.play()  
+
+    except:
+        #play sound when MMR is **NOT** here
+        playsound('bad.wav')
+
 
 def get_link_to_clipboard():
-    url =app.clipboard_get()
+    url = app.clipboard_get()
     cf_url ='https://dotacastlefight.com/players/'
 
     #generate steamid64
@@ -56,6 +90,7 @@ def get_link_to_clipboard():
     k = str(str(cf_url)+str(steamid64))
     app.clipboard_clear()
     app.clipboard_append(k)
+
 
 #just to make sure that icon will be in .exe file
 def resource_path(relative_path):    
