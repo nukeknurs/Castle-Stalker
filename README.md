@@ -2,7 +2,7 @@
 
 Contains `Kamil.py` which is Python3 script that let's you stalk people playing Castle Flipper with ease!
 
->Click GIF below to get newest release. :tada:
+>Click GIF below to get the newest release. :tada:
 
 [![](https://raw.githubusercontent.com/nukeknurs/Castle-Stalker/master/Screenshots/SuperKamil.gif)](https://github.com/nukeknurs/Castle-Stalker/releases)
 
