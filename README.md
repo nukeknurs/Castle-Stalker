@@ -1,6 +1,6 @@
 # Castle-Stalker
 
-Contains `Kamil.py` which is Python3 script that let's you stalk people playing Castle Flipper with ease!
+Contains `Kamil.py` which is Python3 script that let's you stalk people playing Castle Fight with ease!
 
 >Click GIF below to get the newest release. :tada:
 
