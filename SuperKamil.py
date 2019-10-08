@@ -1,21 +1,21 @@
 import os
 import sys
+from io import BytesIO
+from tempfile import NamedTemporaryFile
+from time import sleep
 from tkinter import *
 from tkinter.ttk import *
 from webbrowser import open_new
-from gtts import gTTS
-from time import sleep
-from tempfile import NamedTemporaryFile
-
-from io import BytesIO
 
 import keyboard
 from bs4 import BeautifulSoup
-from requests_html import HTMLSession
-from steam import steamid
+from gtts import gTTS
 from playsound import playsound
 from pygame import mixer
+from requests_html import HTMLSession
+from steam import steamid
 
+# language which is used by speech generator 
 language="pl"
 
 '''CUSTOM DEFINITIONS'''

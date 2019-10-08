@@ -2,7 +2,12 @@
 __pycache__/
 *.py[cod]
 *$py.class
+
+#Junk and test files
 test.py
+players.js
+
+
 # C extensions
 *.so
 
