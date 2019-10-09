@@ -1,8 +1,3 @@
-<p align="center">
-  <img src="Icon/icons8-castle-64.png" width="256">
-</p>
-
-
 # Castle-Stalker
 
 Contains ~~`Kamil.py`~~ **`SuperKamil.py`** which is Python3 script that let's you stalk people playing Castle Fight with ease!
@@ -19,4 +14,9 @@ Contains ~~`Kamil.py`~~ **`SuperKamil.py`** which is Python3 script that let's y
 > Now it can read aloud MMR! Aaaand you'll heard sound too! When sth bad happend, you'll just know it :grin:
 4. App is floating on top, but sometimes not over Dota 2 (fullscreen mode), **BUT** it should detect url in clipboard and shortcut should work even though app is not directly in focus.
 
-Icon provided by [Icons8](https://icons8.com)
+<br>
+<div align="center">
+  <img src="Icon/icons8-castle-64.png" width="100">
+
+  Icon provided by [Icons8](https://icons8.com)
+</div>
