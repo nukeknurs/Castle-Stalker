@@ -6,6 +6,7 @@ from io import BytesIO
 from tempfile import NamedTemporaryFile
 from time import sleep
 from tkinter import *
+import tkinter as tk
 from tkinter.ttk import *
 from webbrowser import open_new
 
@@ -60,20 +61,22 @@ def get_MMR_2(steamid64):
 
         name = json.loads(str(soup.text))
 
-        username = str(name["username"])
-        MMR = str(': '+str(name["mmr"])+'\n')
+        user = str(name["username"])
+        MMR = str(str(name["mmr"])+'\n')
 
-        text_box.insert(INSERT,username[0:10])
-        text_box.insert(INSERT,MMR)
+        username = str(user[0:15]+'\n')
+
+        text_box.insert(INSERT,username)
+        text_box2.insert(INSERT,MMR, 'center')
 
         #print('Player MMR: \t\t',name["username"])
         #print('Player MMR: \t\t',name["mmr"],'\n')
 
     except:
-        no_name = str('NO DATA: ')
-        no_MMR = str('NO DATA\n')
+        no_name = str('NO DATA\n')
+        no_MMR = str('NONE\n')
         text_box.insert(INSERT,no_name)
-        text_box.insert(INSERT,no_MMR)
+        text_box2.insert(INSERT,no_MMR, 'center')
 
 
 def get_MMR_from_file():
@@ -108,17 +111,20 @@ def get_MMR_from_file():
     #unlocks text_box and clears it
     text_box.config(state=NORMAL)
     text_box.delete('1.0', END)
+    text_box2.config(state=NORMAL)
+    text_box2.delete('1.0', END)
 
     for i in converted_x:
 
         #print(i[2:])
         k = steamid.make_steam64(i[2:])
-        numer = str(int(i[0])+1)+'. '
-        text_box.insert(INSERT,numer)
+        number = str(int(i[0])+1)+'. '
+        text_box.insert(INSERT,number)
         get_MMR_2(k)
         playsound('pop.wav')
 
     text_box.config(state=DISABLED)
+    text_box2.config(state=DISABLED)
 
 #pretty self explanatory, I guess
 def get_MMR():
@@ -223,22 +229,41 @@ style.configure('BW.TText',
                 background='black')
 
 
-'''TEXT BOX'''
-text_box = Text(app,
+'''TEXT BOXES'''
+text_box = tk.Text(app,
                 height=8,
-                width=8,
+                width=4,
                 bg='black',
                 fg='white',
                 font='Calibri')
+
 
 text_box.grid(                    
                 row=6,
                 column=0,
                 columnspan=4,
-                sticky='nesw')
+                sticky='nsew')
+
+text_box2 = Text(app,
+                height=8,
+                width=6,
+                bg='black',
+                fg='white',
+                font='Calibri')
+
+text_box2.tag_configure("center", justify='center')
+text_box2.tag_add("center", 1.0, "end")
+
+
+text_box2.grid(                    
+                row=6,
+                column=1,
+                columnspan=4,
+                sticky='nse')
 
 #just to not temt fate
 text_box.config(state=DISABLED)
+text_box2.config(state=DISABLED)
 
 
 '''LABELS'''
@@ -254,9 +279,24 @@ blank.grid( row=1,
 Label(app,  text='MMR:', 
             style='BW.TLabel').grid(
                 pady=10,
-                row=1, 
-                sticky=W)
+                row=1,
+                column=0, 
+                sticky='nsew')
 
+Label(app,  text='Username', 
+            style='BW.TLabel').grid(
+                pady=2,
+                row=5, 
+                column=0,
+                columnspan=2,
+                sticky='ns')
+
+Label(app,  text='MMR', 
+            style='BW.TLabel').grid(
+                pady=2,
+                row=5, 
+                column=2,
+                sticky='ns')
 
 
 '''BUTTONS'''
