@@ -1,4 +1,6 @@
+import json
 import os
+import re
 import sys
 from io import BytesIO
 from tempfile import NamedTemporaryFile
@@ -15,8 +17,14 @@ from pygame import mixer
 from requests_html import HTMLSession
 from steam import steamid
 
+
 # language which is used by speech generator 
 language="pl"
+
+#this line is importat for option "From file" to work
+server_log_location = 'L:/SteamLibrary/steamapps/common/dota 2 beta/game/dota/server_log.txt'
+
+
 
 '''CUSTOM DEFINITIONS'''
 #changes link inside clipboard from Steam user profile to CastleFight profile
@@ -27,13 +35,97 @@ def link_change():
     k=str(str(cf_url)+str(steamid64))
     open_new(k)
 
+#converts string to list and space as separator
+def Convert(string): 
+    li = list(string.split(" ")) 
+    return li 
+
+
+def get_MMR_2(steamid64):
+
+    try:
+        cf_url ='https://dotacastlefight.com/api/players/'
+
+        new_url =str(str(cf_url)+str(steamid64))
+
+        #create html session
+        session = HTMLSession()
+        r = session.get(str(new_url))
+
+        #get html page content as text
+        html_page =r.html.text
+
+        #parse and find 'mmr' inside
+        soup = BeautifulSoup(html_page ,'lxml')
+
+        name = json.loads(str(soup.text))
+
+        username = str(name["username"])
+        MMR = str(': '+str(name["mmr"])+'\n')
+
+        text_box.insert(INSERT,username[0:10])
+        text_box.insert(INSERT,MMR)
+
+        #print('Player MMR: \t\t',name["username"])
+        #print('Player MMR: \t\t',name["mmr"],'\n')
+
+    except:
+        no_name = str('NO DATA: ')
+        no_MMR = str('NO DATA\n')
+        text_box.insert(INSERT,no_name)
+        text_box.insert(INSERT,no_MMR)
+
+
+def get_MMR_from_file():
+
+    #handles file
+    fileHandle = open (server_log_location,"r" )
+    lineList = fileHandle.readlines()
+    fileHandle.close()
+
+    amount = -1
+
+    if 'loopback' in str(lineList[amount]):
+        amount = -2
+
+        if 'Party' in str(lineList[amount]):
+            result = re.search('DOTA_GAMEMODE_CUSTOM (.*)\) ', lineList[amount])    #wartość przy current_line zmieniać co parzyste, online chyba co nieparzyste
+
+        else:
+            result = re.search('DOTA_GAMEMODE_CUSTOM (.*)\)', lineList[amount])
+
+    else:
+        if 'Party' in str(lineList[amount]):
+            result = re.search('DOTA_GAMEMODE_CUSTOM (.*)\) ', lineList[amount])    #wartość przy current_line zmieniać co parzyste, online chyba co nieparzyste
+
+        else:
+            result = re.search('DOTA_GAMEMODE_CUSTOM (.*)\)', lineList[amount])
+
+
+    x = result.group(1)
+    converted_x = Convert(x)
+
+    #unlocks text_box and clears it
+    text_box.config(state=NORMAL)
+    text_box.delete('1.0', END)
+
+    for i in converted_x:
+
+        #print(i[2:])
+        k = steamid.make_steam64(i[2:])
+        numer = str(int(i[0])+1)+'. '
+        text_box.insert(INSERT,numer)
+        get_MMR_2(k)
+        playsound('pop.wav')
+
+    text_box.config(state=DISABLED)
 
 #pretty self explanatory, I guess
 def get_MMR():
     try:
 
         #clears inputbox
-        blank.delete(0, END)
+        #blank.delete(0, END)
         url =app.clipboard_get()
 
         cf_url ='https://dotacastlefight.com/api/players/'
@@ -49,16 +141,17 @@ def get_MMR():
 
         #parse and find 'mmr' inside
         soup = BeautifulSoup(html_page ,'lxml')
-        value =str(soup)[str(soup).find('mmr')+5:str(soup).find('mmr')+9]
+        name = json.loads(str(soup.text))
+        value = name["mmr"]
 
         #returns 'value' inside inputbox
-        blank.insert(0,value)
+        blank.configure(text=value, font='bold')
 
         #play sound when MMR is here
         playsound('good.wav')
 
         #GET Goole to read MMR
-        myobj = gTTS(text=value, lang=language, slow=False)
+        myobj = gTTS(text=str(value), lang=language, slow=False)
 
         #store it
         f = NamedTemporaryFile(suffix='.mp3',)
@@ -112,66 +205,115 @@ app.configure(background='black')
 #icon in the top left corner
 app.iconbitmap(default=resource_path('icons8-castle-64.ico'))
 
-#styles
+'''STYLES'''
 style = Style()
 style.configure('W.TButton', 
                 foreground = 'black', 
-                background = 'white')
+                background = 'white',
+                bd=0,
+                bg='black')
 
 style.configure("BW.TLabel",
                 font = ('bold'), 
                 foreground="white", 
                 background="black")
 
+style.configure('BW.TText',
+                foreground='white',
+                background='black')
+
+
+'''TEXT BOX'''
+text_box = Text(app,
+                height=8,
+                width=8,
+                bg='black',
+                fg='white',
+                font='Calibri')
+
+text_box.grid(                    
+                row=6,
+                column=0,
+                columnspan=4,
+                sticky='nesw')
+
+#just to not temt fate
+text_box.config(state=DISABLED)
 
 
 '''LABELS'''
 #MMR output box
-blank = Entry(app)
-Label(app,  text="MMR", 
-            style='BW.TLabel').grid(
-                row=1, 
-                sticky=W)
+blank = Label(app,
+                background='black',
+                foreground='white')
 
 blank.grid( row=1, 
-            column=1)
+            column=1,
+            pady=10)
+
+Label(app,  text='MMR:', 
+            style='BW.TLabel').grid(
+                pady=10,
+                row=1, 
+                sticky=W)
 
 
 
 '''BUTTONS'''
-Button(app, text='Show MMR', 
+Button(app, 
+            text='Show MMR', 
             command=get_MMR, 
             style="W.TButton").grid(
-                row=1, 
-                column=2, 
-                sticky=W)
+                row=4, 
+                column=1, 
+                sticky='nesw')
 
-Button(app, text='Get CF link', 
+
+'''
+Button(app, 
+            text='Get CF link', 
             command=get_link_to_clipboard, 
             style="W.TButton").grid(
                 row=4, 
                 column=0,
                 sticky=W)
+'''
 
-Button(app, text='Show profile', 
+
+Button(app, 
+            text='Show profile', 
             command=link_change, 
+            style="W.TButton").grid(
+                row=4, 
+                column=0, 
+                sticky=E)
+
+
+Button(app, 
+            text='From file', 
+            command=get_MMR_from_file, 
             style="W.TButton").grid(
                 row=4, 
                 column=2, 
                 sticky=E)
 
-Button(app, text='Quit', 
+
+Button(app, 
+            text='Quit',
             command=app.destroy, 
             style="W.TButton").grid(
-                row=5, 
+                row=7, 
                 column=1, 
-                sticky=N)
+                sticky='n',
+                pady=3,
+                padx=5)
 
 
 
 '''SHORTCUTS'''
 #triggers get_MMR on hotkey
-keyboard.add_hotkey('capslock',get_MMR)
+keyboard.add_hotkey('caps lock',get_MMR)
+keyboard.add_hotkey('ctrl+shift',get_MMR_from_file)
 
 
 
