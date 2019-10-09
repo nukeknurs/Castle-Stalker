@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="static/Icon/icons8-castle-64.png" width="256">
+</p>
+
+
 # Castle-Stalker
 
 Contains ~~`Kamil.py`~~ **`SuperKamil.py`** which is Python3 script that let's you stalk people playing Castle Fight with ease!
@@ -11,7 +16,7 @@ Contains ~~`Kamil.py`~~ **`SuperKamil.py`** which is Python3 script that let's y
 1. Open executable or run script, you know the gig.
 1. Get `url` of steam profile for desired player (like on GIF).
 1. Tap <kbd>CAPS LOCK</kbd> and if he/she played Castle Fight you'll see MMR. 
-> ~~When you have something different inside clipboard or player haven't played CF ever or after MMR update **shortcut might stop working**. But hey, I made you nice button, so don't be sad.~~ FIXED, now you'll heard sound! When sth bad happend, you'll know it :grin:
+> Now it can read aloud MMR! Aaaand you'll heard sound too! When sth bad happend, you'll just know it :grin:
 4. App is floating on top, but sometimes not over Dota 2 (fullscreen mode), **BUT** it should detect url in clipboard and shortcut should work even though app is not directly in focus.
 
 Icon provided by [Icons8](https://icons8.com)
