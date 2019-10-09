@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="static/Icon/icons8-castle-64.png" width="256">
+  <img src="Icon/icons8-castle-64.png" width="256">
 </p>
 
 
