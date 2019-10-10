@@ -1,12 +1,15 @@
 import json
+import logging
 import os
+import os.path
 import re
 import sys
+import time
+import tkinter as tk
 from io import BytesIO
 from tempfile import NamedTemporaryFile
 from time import sleep
 from tkinter import *
-import tkinter as tk
 from tkinter.ttk import *
 from webbrowser import open_new
 
@@ -19,6 +22,7 @@ from requests_html import HTMLSession
 from steam import steamid
 
 
+
 # language which is used by speech generator 
 language="pl"
 
@@ -26,8 +30,104 @@ language="pl"
 server_log_location = 'L:/SteamLibrary/steamapps/common/dota 2 beta/game/dota/server_log.txt'
 
 
-
 '''CUSTOM DEFINITIONS'''
+#this module should watch file for changes and if detects any 
+#reports current MMR values for all players
+'''
+import sys, os.path, time, logging
+from watchdog.observers import Observer
+from watchdog.events import PatternMatchingEventHandler
+import os
+
+temp_name = '1.txt'
+
+def kamil():
+
+    try:
+    
+        f = open(temp_name,'r')
+        number = int(f.read())
+        number = number + 3
+        f.close()
+
+        f = open(temp_name,'w')
+        f.write(str(number))
+        print(number)
+
+        if number >= 5:
+
+            f.close()
+            os.remove(temp_name)
+            number = 0
+            
+            #tutaj wpisać co funkcja ma wykonywać. DOKŁADNIE KURWA TUTAJ
+
+        else:
+            
+            f.close()
+
+    except:
+
+        temp = open(temp_name,'w+')
+        temp.write('1')
+        temp.close()
+
+        kamil()
+
+
+class MyEventHandler(PatternMatchingEventHandler):
+
+    def on_moved(self, event):
+        super(MyEventHandler, self).on_moved(event)
+        logging.info("File %s was just moved" % event.src_path)
+
+    def on_created(self, event): 
+        super(MyEventHandler, self).on_created(event)
+        logging.info("File %s was just created" % event.src_path)
+
+    def on_deleted(self, event):
+        super(MyEventHandler, self).on_deleted(event)
+        logging.info("File %s was just deleted" % event.src_path)
+
+    def on_modified(self, event):
+        super(MyEventHandler, self).on_modified(event)
+        logging.info("File %s was just modified" % event.src_path)
+        print('Raz, czy dwa?')
+        kamil()
+
+
+
+def main(file_path=None):
+
+    logging.basicConfig(level=logging.INFO,
+        format='%(asctime)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S')
+
+    watched_dir = os.path.split(file_path)[0]
+    print(watched_dir)
+    print( 'watched_dir = {watched_dir}'.format(watched_dir=watched_dir))
+    patterns = [file_path]
+    print( 'patterns = {patterns}'.format(patterns=', '.join(patterns)))
+    event_handler = MyEventHandler(patterns=patterns)
+    observer = Observer()
+    observer.schedule(event_handler, watched_dir, recursive=True)
+    observer.start()
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        observer.stop()
+    observer.join()
+
+
+
+if __name__ == "__main__":
+    if 1:
+        path = 'G:/GitHub/Castle-Stalker/penis.txt'
+        main(file_path=path.strip())
+'''
+
+
 #changes link inside clipboard from Steam user profile to CastleFight profile
 def link_change():
     url=app.clipboard_get()
@@ -77,6 +177,7 @@ def get_MMR_2(steamid64):
         no_MMR = str('NONE\n')
         text_box.insert(INSERT,no_name)
         text_box2.insert(INSERT,no_MMR, 'center')
+
 
 
 def get_MMR_from_file():
