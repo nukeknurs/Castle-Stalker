@@ -24,11 +24,28 @@ from steam import steamid
 import threading
 
 
+'''MAIN CONFIG SCHEME'''
+#config to your liking
+#all colors
+light_grey = '#c2c2c2'
+dark_grey= '#828282'
+everything_that_is_white = '#ffffff'
+everything_that_is_black = '#000000'
 
-# language which is used by speech generator 
-language="pl"
+#all fonts
+label_font = 'Helvetica 15 bold'
+button_font = 'Arial 10'
+mainText_font = 'Arial 14'
+progressBar_font = 'Arial 9'
 
-#this line is importat for option "From file" to work
+#main window attributes
+alpha = 0.8
+always_on_top = True
+
+#language which is used by speech generator 
+language='pl'
+
+#this line is importat for option 'From file' to work
 server_log_location = 'L:/SteamLibrary/steamapps/common/dota 2 beta/game/dota/server_log.txt'
 
 #Temporary file where server_log is stored
@@ -36,106 +53,24 @@ temp_name = 'tmp.txt'
 temp = open(temp_name,'w+')
 temp.close()
 
+#time in which app checks file for changes
+time_in_seconds_to_check_for_changes = 60
+
+#convert seconds to miliseconds
+interval = time_in_seconds_to_check_for_changes * 1000   
+
+#time to first check file after startup
+first_check = interval//100
+
+#-------------------------------------------------------------------------------------------------#
 
 '''CUSTOM DEFINITIONS'''
 #this module should watch file for changes and if detects any 
 #reports current MMR values for all players
-'''
-import sys, os.path, time, logging
-from watchdog.observers import Observer
-from watchdog.events import PatternMatchingEventHandler
-import os
-
-temp_name = '1.txt'
-
-def kamil():
-
-    try:
-    
-        f = open(temp_name,'r')
-        number = int(f.read())
-        number = number + 3
-        f.close()
-
-        f = open(temp_name,'w')
-        f.write(str(number))
-        print(number)
-
-        if number >= 5:
-
-            f.close()
-            os.remove(temp_name)
-            number = 0
-            
-            #tutaj wpisać co funkcja ma wykonywać. DOKŁADNIE KURWA TUTAJ
-
-        else:
-            
-            f.close()
-
-    except:
-
-        temp = open(temp_name,'w+')
-        temp.write('1')
-        temp.close()
-
-        kamil()
-
-
-class MyEventHandler(PatternMatchingEventHandler):
-
-    def on_moved(self, event):
-        super(MyEventHandler, self).on_moved(event)
-        logging.info("File %s was just moved" % event.src_path)
-
-    def on_created(self, event): 
-        super(MyEventHandler, self).on_created(event)
-        logging.info("File %s was just created" % event.src_path)
-
-    def on_deleted(self, event):
-        super(MyEventHandler, self).on_deleted(event)
-        logging.info("File %s was just deleted" % event.src_path)
-
-    def on_modified(self, event):
-        super(MyEventHandler, self).on_modified(event)
-        logging.info("File %s was just modified" % event.src_path)
-        print('Raz, czy dwa?')
-        kamil()
-
-
-
-def main(file_path=None):
-
-    logging.basicConfig(level=logging.INFO,
-        format='%(asctime)s - %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S')
-
-    watched_dir = os.path.split(file_path)[0]
-    print(watched_dir)
-    print( 'watched_dir = {watched_dir}'.format(watched_dir=watched_dir))
-    patterns = [file_path]
-    print( 'patterns = {patterns}'.format(patterns=', '.join(patterns)))
-    event_handler = MyEventHandler(patterns=patterns)
-    observer = Observer()
-    observer.schedule(event_handler, watched_dir, recursive=True)
-    observer.start()
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        observer.stop()
-    observer.join()
-
-path = 'G:/GitHub/Castle-Stalker/penis.txt'
-
-
-threading.Thread(main(file_path=path.strip())).start
-
-'''
 
 def quick_check():
 
-    fileHandle = open (server_log_location,"r" )
+    fileHandle = open (server_log_location,'r' )
     line_serverList = fileHandle.readlines()
     fileHandle.close()
 
@@ -148,11 +83,11 @@ def quick_check():
     try:
         if str(log_memorization) != log_content:
 
-            print('weszło w ifa!')
+            #print('weszło w ifa!')
             temp = open(temp_name,'w+')
             temp.write(log_content)
 
-            print(log_content)
+            #print(log_content)
             temp.close()
             get_MMR_from_file()
 
@@ -162,10 +97,13 @@ def quick_check():
         pass
 
     except:
-        print('weszło w except')
+        pass
 
-    #progress()
-    app.after(3000, quick_check)
+
+    run_progressBar()
+    #print('checking')
+    
+    app.after(1, quick_check)
 
 
 
@@ -179,7 +117,7 @@ def link_change():
 
 #converts string to list and space as separator
 def Convert(string): 
-    li = list(string.split(" ")) 
+    li = list(string.split(' ')) 
     return li 
 
 
@@ -202,16 +140,16 @@ def get_MMR_2(steamid64):
 
         name = json.loads(str(soup.text))
 
-        user = str(name["username"])
-        MMR = str(str(name["mmr"])+'\n')
+        user = str(name['username'])
+        MMR = str(str(name['mmr'])+'\n')
 
         username = str(user[0:15]+'\n')
 
         text_box.insert(INSERT,username)
         text_box2.insert(INSERT,MMR, 'center')
 
-        #print('Player MMR: \t\t',name["username"])
-        #print('Player MMR: \t\t',name["mmr"],'\n')
+        #print('Player MMR: \t\t',name['username'])
+        #print('Player MMR: \t\t',name['mmr'],'\n')
 
     except:
         no_name = str('NO DATA\n')
@@ -224,7 +162,7 @@ def get_MMR_2(steamid64):
 def get_MMR_from_file():
 
     #handles file
-    fileHandle = open (server_log_location,"r" )
+    fileHandle = open (server_log_location,'r' )
     lineList = fileHandle.readlines()
     fileHandle.close()
 
@@ -263,7 +201,7 @@ def get_MMR_from_file():
         number = str(int(i[0])+1)+'. '
         text_box.insert(INSERT,number)
         get_MMR_2(k)
-        playsound('pop.wav')
+        playsound('./Sounds/pop.wav')
 
     text_box.config(state=DISABLED)
     text_box2.config(state=DISABLED)
@@ -290,13 +228,13 @@ def get_MMR():
         #parse and find 'mmr' inside
         soup = BeautifulSoup(html_page ,'lxml')
         name = json.loads(str(soup.text))
-        value = name["mmr"]
+        value = name['mmr']
 
         #returns 'value' inside inputbox
-        blank.configure(text=value, font='bold')
+        blank.configure(text=value, font=label_font)
 
         #play sound when MMR is here
-        playsound('good.wav')
+        playsound('./Sounds/good.wav')
 
         #GET Goole to read MMR
         myobj = gTTS(text=str(value), lang=language, slow=False)
@@ -317,7 +255,7 @@ def get_MMR():
 
     except:
         #play sound when MMR is **NOT** here
-        playsound('bad.wav')
+        playsound('./Sounds/bad.wav')
 
 
 def get_link_to_clipboard():
@@ -338,26 +276,33 @@ def resource_path(relative_path):
     try:       
         base_path = sys._MEIPASS
     except Exception:
-        base_path = os.path.abspath(".")
+        base_path = os.path.abspath('.')
     return os.path.join(base_path, relative_path)
 
-'''
-def progress():
 
-    maxValue=100
-    currentValue=0
+def run_progressBar():
 
-    progressbar['value']=currentValue
-    progressbar['maximum']=maxValue
+    max_value=1000
 
+    progressBar['value'] = 0
+    progressBar['maximum'] = max_value
 
-    divisions=10
+    #counts time left to another check
+    sleep_time=interval/1000000
+    step_time = float(interval/(max_value*1000))
+    starting_time = interval/max_value
+    time_left = starting_time
 
-    for i in range(divisions):
-        currentValue=currentValue+10
-        time.sleep(0.3)
-        progressbar.update()
-'''
+    for i in range(1,1001):
+        time.sleep(sleep_time)
+        text=str('Automatic check in: '+ str(round(time_left,1))+' seconds')
+        progressBar_style.configure('Horizontal.TProgressbar',text=text)
+        time_left = starting_time - (step_time*i)
+        progressBar['value'] = i
+        #uncomment to print all steps in the console
+        #print('step:\t',float(i),'time left:\t',round(time_left,3))
+        progressBar.update()
+
 
 def Exit():
     os.remove('tmp.txt')
@@ -371,60 +316,63 @@ app = Tk()
 
 app.title('Kamil')
 #app.geometry('250x100')
-app.wm_attributes('-alpha',0.8,'-topmost',1)
-app.configure(background='black')
+app.wm_attributes('-alpha',alpha,'-topmost',always_on_top)
+app.configure(background=everything_that_is_black)
 
 #icon in the top left corner
 app.iconbitmap(default=resource_path('icons8-castle-64.ico'))
 
+
+
 '''STYLES'''
 style = Style()
-style.configure('W.TButton', 
-                foreground = 'black', 
-                background = 'white',
-                bd=0,
-                bg='black')
+Style().theme_use('clam')
+style.configure('W.TButton', font=(button_font),
+                foreground = dark_grey, 
+                background = everything_that_is_black, 
+                relief='groove',
+                borderwidth=1)
 
-style.configure("BW.TLabel",
-                font = ('bold'), 
-                foreground="white", 
-                background="black")
+style.configure('BW.TLabel', font=(label_font),
+                foreground=everything_that_is_white, 
+                background=everything_that_is_black)
 
-style.configure('BW.TText',
-                foreground='white',
-                background='black')
+style.configure('BW.TText', font=('Roboto 10'),
+                foreground=everything_that_is_white,
+                background=everything_that_is_black)
+
 
 
 '''TEXT BOXES'''
 text_box = tk.Text(app,
                 height=8,
-                width=4,
-                bg='black',
-                fg='white',
-                font='Calibri')
+                width=18,
+                bg=everything_that_is_black,
+                fg=everything_that_is_white,
+                font=mainText_font,bd=1)
 
 
 text_box.grid(                    
                 row=6,
                 column=0,
-                columnspan=4,
+                columnspan=3,
                 sticky='nsew')
 
 text_box2 = Text(app,
                 height=8,
-                width=6,
-                bg='black',
-                fg='white',
-                font='Calibri')
+                width=8,
+                bg=everything_that_is_black,
+                fg=everything_that_is_white,
+                font=mainText_font,bd=1)
 
-text_box2.tag_configure("center", justify='center')
-text_box2.tag_add("center", 1.0, "end")
+text_box2.tag_configure('center', justify='center')
+text_box2.tag_add('center', 1.0, 'end')
 
 
 text_box2.grid(                    
                 row=6,
-                column=1,
-                columnspan=4,
+                column=2,
+                #columnspan=4,
                 sticky='nse')
 
 #just to not temt fate
@@ -432,17 +380,18 @@ text_box.config(state=DISABLED)
 text_box2.config(state=DISABLED)
 
 
+
 '''LABELS'''
 #MMR output box
 blank = Label(app,
-                background='black',
-                foreground='white')
+                background=everything_that_is_black,
+                foreground=everything_that_is_white)
 
 blank.grid( row=1, 
             column=1,
             pady=10)
 
-Label(app,  text='MMR:', 
+Label(app,  text='', 
             style='BW.TLabel').grid(
                 pady=10,
                 row=1,
@@ -451,7 +400,7 @@ Label(app,  text='MMR:',
 
 Label(app,  text='Username', 
             style='BW.TLabel').grid(
-                pady=2,
+                pady=5,
                 row=5, 
                 column=0,
                 columnspan=2,
@@ -459,17 +408,18 @@ Label(app,  text='Username',
 
 Label(app,  text='MMR', 
             style='BW.TLabel').grid(
-                pady=2,
+                pady=5,
                 row=5, 
                 column=2,
                 sticky='ns')
+
 
 
 '''BUTTONS'''
 Button(app, 
             text='Show MMR', 
             command=get_MMR, 
-            style="W.TButton").grid(
+            style='W.TButton').grid(
                 row=4, 
                 column=1, 
                 sticky='nesw')
@@ -479,7 +429,7 @@ Button(app,
 Button(app, 
             text='Get CF link', 
             command=get_link_to_clipboard, 
-            style="W.TButton").grid(
+            style='W.TButton').grid(
                 row=4, 
                 column=0,
                 sticky=W)
@@ -489,41 +439,76 @@ Button(app,
 Button(app, 
             text='Show profile', 
             command=link_change, 
-            style="W.TButton").grid(
+            style='W.TButton').grid(
                 row=4, 
                 column=0, 
-                sticky=E)
+                sticky='nesw')
 
 
 Button(app, 
             text='From file', 
             command=get_MMR_from_file, 
-            style="W.TButton").grid(
+            style='W.TButton').grid(
                 row=4, 
                 column=2, 
-                sticky=E)
+                sticky='nesw')
 
 
 Button(app, 
             text='Quit',
             command=Exit, 
-            style="W.TButton").grid(
-                row=7, 
+            style='W.TButton').grid(
+                row=8, 
                 column=1, 
                 sticky='n',
                 pady=3,
                 padx=5)
 
-'''
-POGRESS BAR
-progressbar = ttk.Progressbar(app,
-            style = "W.TButton",
-            mode="indeterminate").grid(
-                row=8, 
+
+
+'''POGRESS BAR'''
+variable = tk.DoubleVar(app)
+
+progressBar = ttk.Progressbar(app,
+             orient='horizontal',
+             style='Horizontal.TProgressbar',
+             mode='determinate')
+            
+
+progressBar.grid(
+                row=7,
                 column=0,
                 columnspan=3,
-                sticky='nesw',
-                pady=2)
+                #pady=3,
+                ipady=3,
+                sticky='nesw')
+
+progressBar_style = Style()
+#progressBar_style.theme_use('winnative') #to choose from ('xpnative','winnative','clam', 'alt', 'default', 'classic','vista')
+
+progressBar_style.layout('Horizontal.TProgressbar',
+             [('Horizontal.Progressbar.trough',
+               {'children': [('Horizontal.Progressbar.pbar',
+               {'side': 'left', 'sticky': 'ns'})],
+                'sticky': 'nswe'}), 
+              ('Horizontal.Progressbar.label', {'sticky': ''}),
+              ('Horizontal.Progressbar.border', {'border': 'False'})])
+
+progressBar_style.configure('Horizontal.TProgressbar', text='',font=(progressBar_font))
+
+style.configure('Horizontal.TProgressbar', 
+                troughcolor= dark_grey, 
+                bordercolor=dark_grey, 
+                background=light_grey, 
+                lightcolor=light_grey, 
+                darkcolor=light_grey,
+                width=30)
+
+'''
+THREADING ATTEMPT
+progressBar_thread = threading.Thread()
+progressBar_thread.__init__(target=run_progressBar, args=())
+#progressBar_thread.start()
 '''
 
 
@@ -534,8 +519,9 @@ keyboard.add_hotkey('ctrl+shift',get_MMR_from_file)
 
 
 
-#apploop
+#triggering progressbar and first file check
+app.after(first_check,quick_check)
 
-app.after(3000,quick_check)
+#apploop
 app.mainloop()
 
