@@ -20,6 +20,7 @@ from playsound import playsound
 from pygame import mixer
 from requests_html import HTMLSession
 from steam import steamid
+import threading
 
 
 
@@ -119,13 +120,29 @@ def main(file_path=None):
         observer.stop()
     observer.join()
 
+path = 'G:/GitHub/Castle-Stalker/penis.txt'
 
 
-if __name__ == "__main__":
-    if 1:
-        path = 'G:/GitHub/Castle-Stalker/penis.txt'
-        main(file_path=path.strip())
+threading.Thread(main(file_path=path.strip())).start
+
 '''
+
+def quick_check():
+
+    fileHandle = open (server_log_location,"r" )
+    line_serverList = fileHandle.readlines()
+    fileHandle.close()
+    
+    try:
+        if log_content == line_serverList[-1:-3]:
+            print('weszło w try')
+            pass
+        pass
+
+    except:
+        log_content = line_serverList[-1:-3]
+        get_MMR_from_file()
+        print('weszło w except')
 
 
 #changes link inside clipboard from Steam user profile to CastleFight profile
@@ -301,9 +318,10 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 
-
 '''MAIN APP MODULE'''
 app = Tk()
+
+
 app.title('Kamil')
 #app.geometry('250x100')
 app.wm_attributes('-alpha',0.8,'-topmost',1)
@@ -459,4 +477,7 @@ keyboard.add_hotkey('ctrl+shift',get_MMR_from_file)
 
 
 #apploop
+
+app.after(0,quick_check())
 app.mainloop()
+
