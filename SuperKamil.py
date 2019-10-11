@@ -12,6 +12,7 @@ from time import sleep
 from tkinter import *
 from tkinter.ttk import *
 from webbrowser import open_new
+from tkinter import ttk
 
 import keyboard
 from bs4 import BeautifulSoup
@@ -29,6 +30,11 @@ language="pl"
 
 #this line is importat for option "From file" to work
 server_log_location = 'L:/SteamLibrary/steamapps/common/dota 2 beta/game/dota/server_log.txt'
+
+#Temporary file where server_log is stored
+temp_name = 'tmp.txt'
+temp = open(temp_name,'w+')
+temp.close()
 
 
 '''CUSTOM DEFINITIONS'''
@@ -132,17 +138,35 @@ def quick_check():
     fileHandle = open (server_log_location,"r" )
     line_serverList = fileHandle.readlines()
     fileHandle.close()
-    
+
+    log_content = str(line_serverList[-3:])
+
+    f = open(temp_name,'r')
+    log_memorization = f.read()
+    f.close()
+
     try:
-        if log_content == line_serverList[-1:-3]:
-            print('weszło w try')
+        if str(log_memorization) != log_content:
+
+            print('weszło w ifa!')
+            temp = open(temp_name,'w+')
+            temp.write(log_content)
+
+            print(log_content)
+            temp.close()
+            get_MMR_from_file()
+
+            pass
+        else:
             pass
         pass
 
     except:
-        log_content = line_serverList[-1:-3]
-        get_MMR_from_file()
         print('weszło w except')
+
+    #progress()
+    app.after(3000, quick_check)
+
 
 
 #changes link inside clipboard from Steam user profile to CastleFight profile
@@ -317,6 +341,29 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
 
+'''
+def progress():
+
+    maxValue=100
+    currentValue=0
+
+    progressbar['value']=currentValue
+    progressbar['maximum']=maxValue
+
+
+    divisions=10
+
+    for i in range(divisions):
+        currentValue=currentValue+10
+        time.sleep(0.3)
+        progressbar.update()
+'''
+
+def Exit():
+    os.remove('tmp.txt')
+    app.destroy()
+
+
 
 '''MAIN APP MODULE'''
 app = Tk()
@@ -459,7 +506,7 @@ Button(app,
 
 Button(app, 
             text='Quit',
-            command=app.destroy, 
+            command=Exit, 
             style="W.TButton").grid(
                 row=7, 
                 column=1, 
@@ -467,6 +514,17 @@ Button(app,
                 pady=3,
                 padx=5)
 
+'''
+POGRESS BAR
+progressbar = ttk.Progressbar(app,
+            style = "W.TButton",
+            mode="indeterminate").grid(
+                row=8, 
+                column=0,
+                columnspan=3,
+                sticky='nesw',
+                pady=2)
+'''
 
 
 '''SHORTCUTS'''
@@ -478,6 +536,6 @@ keyboard.add_hotkey('ctrl+shift',get_MMR_from_file)
 
 #apploop
 
-app.after(0,quick_check())
+app.after(3000,quick_check)
 app.mainloop()
 
