@@ -1,10 +1,10 @@
 import json
-import logging
+#import logging
 import os
 import os.path
 import re
 import sys
-import threading
+#import threading
 import time
 import tkinter as tk
 from io import BytesIO
@@ -23,30 +23,41 @@ from pygame import mixer
 from requests_html import HTMLSession
 from steam import steamid
 
+#just to make sure that icon will be in .exe file
+def resource_path(relative_path):    
+    try:       
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath('.')
+    return os.path.join(base_path, relative_path)
+
+load_config = open('./Config/config.ini','r')
+list_config = load_config.read().splitlines()
+load_config.close()
 
 '''MAIN CONFIG SCHEME'''
 #config to your liking
 #all colors
-light_grey = '#c2c2c2'
-dark_grey= '#828282'
-everything_that_is_white = '#ffffff'
-everything_that_is_black = '#000000'
+light_grey = str('#'+list_config[14])
+dark_grey= str('#'+list_config[17])
+everything_that_is_white = str('#'+str(list_config[20]))
+everything_that_is_black = ('#'+str(list_config[23]))
 
 #all fonts
-label_font = 'Helvetica 15 bold'
-button_font = 'Arial 10 bold'
-mainText_font = 'Arial 14'
-progressBar_font = 'Arial 9 bold'
+label_font = str(list_config[28])
+button_font = str(list_config[31])
+mainText_font = str(list_config[34])
+progressBar_font = str(list_config[37])
 
 #main window attributes
-alpha = 0.8
-always_on_top = True
+alpha = float(list_config[6])
+always_on_top = int(str(list_config[9])[0])
 
 #language which is used by speech generator 
-language='pl'
+language=str(list_config[40])
 
 #this line is importat for option 'From file' to work
-server_log_location = 'L:/SteamLibrary/steamapps/common/dota 2 beta/game/dota/server_log.txt'
+server_log_location = str(list_config[43])
 
 #Temporary file where server_log is stored
 temp_name = 'tmp.txt'
@@ -54,7 +65,7 @@ temp = open(temp_name,'w+')
 temp.close()
 
 #time in which app checks file for changes
-time_in_seconds_to_check_for_changes = 60
+time_in_seconds_to_check_for_changes = int(list_config[46])
 
 #convert seconds to miliseconds
 interval = time_in_seconds_to_check_for_changes * 1000   
@@ -277,15 +288,6 @@ def get_link_to_clipboard():
     app.clipboard_append(k)
 
 
-#just to make sure that icon will be in .exe file
-def resource_path(relative_path):    
-    try:       
-        base_path = sys._MEIPASS
-    except Exception:
-        base_path = os.path.abspath('.')
-    return os.path.join(base_path, relative_path)
-
-
 def run_progressBar():
 
     max_value=1000
@@ -331,7 +333,7 @@ app.wm_attributes('-alpha',alpha,'-topmost',always_on_top)
 app.configure(background=everything_that_is_black)
 
 #icon in the top left corner
-app.iconbitmap(default=resource_path('./Icon/icons8-castle-64.ico'))
+app.iconbitmap(default='./Icon/icons8-castle-64.ico')
 
 #imported PNG to cuz tried to use it somehow, but it's pointless
 #my_png =  PhotoImage(file='./Icon/icons8-castle-64.png')
@@ -536,8 +538,8 @@ progressBar_thread.__init__(target=run_progressBar, args=())
 
 '''SHORTCUTS'''
 #triggers get_MMR on hotkey
-keyboard.add_hotkey('caps lock',get_MMR)
-keyboard.add_hotkey('ctrl+shift',get_MMR_from_file)
+keyboard.add_hotkey(str(list_config[50]),get_MMR)
+keyboard.add_hotkey(str(list_config[53]),get_MMR_from_file)
 
 
 
