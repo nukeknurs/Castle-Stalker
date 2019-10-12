@@ -4,15 +4,16 @@ import os
 import os.path
 import re
 import sys
+import threading
 import time
 import tkinter as tk
 from io import BytesIO
 from tempfile import NamedTemporaryFile
 from time import sleep
 from tkinter import *
+from tkinter import ttk
 from tkinter.ttk import *
 from webbrowser import open_new
-from tkinter import ttk
 
 import keyboard
 from bs4 import BeautifulSoup
@@ -21,8 +22,6 @@ from playsound import playsound
 from pygame import mixer
 from requests_html import HTMLSession
 from steam import steamid
-import threading
-from PIL import Image, ImageTk
 
 
 '''MAIN CONFIG SCHEME'''
@@ -547,4 +546,3 @@ app.after(first_check,quick_check)
 
 #apploop
 app.mainloop()
-
