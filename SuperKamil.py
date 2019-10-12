@@ -22,6 +22,7 @@ from pygame import mixer
 from requests_html import HTMLSession
 from steam import steamid
 import threading
+from PIL import Image, ImageTk
 
 
 '''MAIN CONFIG SCHEME'''
@@ -34,9 +35,9 @@ everything_that_is_black = '#000000'
 
 #all fonts
 label_font = 'Helvetica 15 bold'
-button_font = 'Arial 10'
+button_font = 'Arial 10 bold'
 mainText_font = 'Arial 14'
-progressBar_font = 'Arial 9'
+progressBar_font = 'Arial 9 bold'
 
 #main window attributes
 alpha = 0.8
@@ -133,7 +134,7 @@ def get_MMR_2(steamid64):
         r = session.get(str(new_url))
 
         #get html page content as text
-        html_page =r.html.text
+        html_page = r.html.text
 
         #parse and find 'mmr' inside
         soup = BeautifulSoup(html_page ,'lxml')
@@ -157,7 +158,11 @@ def get_MMR_2(steamid64):
         text_box.insert(INSERT,no_name)
         text_box2.insert(INSERT,no_MMR, 'center')
 
-
+'''
+        r2 = session.get(str(leaderboard_url))
+        leaderboard_url = 'https://dotacastlefight.com/api/leaderboard'
+        html_page_leaderboard = r.html.text
+'''
 
 def get_MMR_from_file():
 
@@ -211,8 +216,7 @@ def get_MMR():
     try:
 
         #clears inputbox
-        #blank.delete(0, END)
-        url =app.clipboard_get()
+        url = app.clipboard_get()
 
         cf_url ='https://dotacastlefight.com/api/players/'
         steamid64 =steamid.steam64_from_url(url, http_timeout=30)
@@ -230,8 +234,11 @@ def get_MMR():
         name = json.loads(str(soup.text))
         value = name['mmr']
 
+        username = name['username']
+
         #returns 'value' inside inputbox
-        blank.configure(text=value, font=label_font)
+        blank.configure(text=value)
+        user_name_label.configure(text=username[0:18])
 
         #play sound when MMR is here
         playsound('./Sounds/good.wav')
@@ -313,15 +320,23 @@ def Exit():
 '''MAIN APP MODULE'''
 app = Tk()
 
+#Title
+app.title('SuperKamil')
+app.resizable(0,0)
 
-app.title('Kamil')
-#app.geometry('250x100')
+#if always_on_top == True or 1:
+app.grab_set()
+app.focus_force()
+
 app.wm_attributes('-alpha',alpha,'-topmost',always_on_top)
 app.configure(background=everything_that_is_black)
 
 #icon in the top left corner
-app.iconbitmap(default=resource_path('icons8-castle-64.ico'))
+app.iconbitmap(default=resource_path('./Icon/icons8-castle-64.ico'))
 
+#imported PNG to cuz tried to use it somehow, but it's pointless
+#my_png =  PhotoImage(file='./Icon/icons8-castle-64.png')
+#my_png = my_png.subsample(2)
 
 
 '''STYLES'''
@@ -331,15 +346,13 @@ style.configure('W.TButton', font=(button_font),
                 foreground = dark_grey, 
                 background = everything_that_is_black, 
                 relief='groove',
-                borderwidth=1)
+                borderwidth=3, 
+                height=20)
 
 style.configure('BW.TLabel', font=(label_font),
                 foreground=everything_that_is_white, 
                 background=everything_that_is_black)
 
-style.configure('BW.TText', font=('Roboto 10'),
-                foreground=everything_that_is_white,
-                background=everything_that_is_black)
 
 
 
@@ -383,20 +396,29 @@ text_box2.config(state=DISABLED)
 
 '''LABELS'''
 #MMR output box
-blank = Label(app,
+blank = Label(app, text='MMR', 
+                font=(label_font),
                 background=everything_that_is_black,
                 foreground=everything_that_is_white)
 
 blank.grid( row=1, 
-            column=1,
-            pady=10)
+            column=2,
+            pady=10,
+            sticky='ns')
 
-Label(app,  text='', 
-            style='BW.TLabel').grid(
+user_name_label = Label(app,
+                font=label_font,
+                background=everything_that_is_black,
+                foreground=everything_that_is_white,
+                text='Nick')
+                #style='BW.TLabel')
+                
+user_name_label.grid(
                 pady=10,
                 row=1,
                 column=0, 
-                sticky='nsew')
+                columnspan=2,
+                sticky='ns')
 
 Label(app,  text='Username', 
             style='BW.TLabel').grid(
@@ -417,7 +439,7 @@ Label(app,  text='MMR',
 
 '''BUTTONS'''
 Button(app, 
-            text='Show MMR', 
+            text='Direct', 
             command=get_MMR, 
             style='W.TButton').grid(
                 row=4, 
@@ -437,7 +459,7 @@ Button(app,
 
 
 Button(app, 
-            text='Show profile', 
+            text='Browser', 
             command=link_change, 
             style='W.TButton').grid(
                 row=4, 
@@ -446,7 +468,7 @@ Button(app,
 
 
 Button(app, 
-            text='From file', 
+            text='File', 
             command=get_MMR_from_file, 
             style='W.TButton').grid(
                 row=4, 
@@ -454,20 +476,19 @@ Button(app,
                 sticky='nesw')
 
 
-Button(app, 
-            text='Quit',
+quit_button = Button(app, 
+            text='Q U I T',
             command=Exit, 
             style='W.TButton').grid(
                 row=8, 
                 column=1, 
-                sticky='n',
+                sticky='ns',
                 pady=3,
                 padx=5)
 
 
 
 '''POGRESS BAR'''
-variable = tk.DoubleVar(app)
 
 progressBar = ttk.Progressbar(app,
              orient='horizontal',
@@ -491,10 +512,12 @@ progressBar_style.layout('Horizontal.TProgressbar',
                {'children': [('Horizontal.Progressbar.pbar',
                {'side': 'left', 'sticky': 'ns'})],
                 'sticky': 'nswe'}), 
-              ('Horizontal.Progressbar.label', {'sticky': ''}),
+              ('Horizontal.Progressbar.label', {'sticky': 'ns'}),
               ('Horizontal.Progressbar.border', {'border': 'False'})])
 
-progressBar_style.configure('Horizontal.TProgressbar', text='',font=(progressBar_font))
+progressBar_style.configure('Horizontal.TProgressbar', 
+                            text='Please wait, loading app and results',
+                            font=(progressBar_font), sticky='ns')
 
 style.configure('Horizontal.TProgressbar', 
                 troughcolor= dark_grey, 

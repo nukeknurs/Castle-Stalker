@@ -4,8 +4,8 @@ __pycache__/
 *$py.class
 
 #Junk and test files
-test.py
-players.js
+test*
+play*
 tmp.txt
 
 # C extensions
